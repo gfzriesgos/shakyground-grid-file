@@ -23,4 +23,5 @@ RUN wget https://earthquake.usgs.gov/static/lfs/data/global_vs30_grd.zip && \
     python3 ./combine_grd_with_valparaiso.py && \
     rm lima_updated_global_vs30.grd && \
     rm global_vs30.grd && \
-    mv valparaiso_updated_global_vs30.grd global_vs30.grd
+    mkdir /usr/share/git/shakyground && \
+    mv valparaiso_updated_global_vs30.grd /usr/share/git/shakyground/global_vs30.grd
