@@ -22,6 +22,6 @@ RUN wget https://earthquake.usgs.gov/static/lfs/data/global_vs30_grd.zip && \
     python3 ./combine_grd_with_lima_data.py && \
     python3 ./combine_grd_with_valparaiso.py && \
     rm lima_updated_global_vs30.grd && \
-    rm global_vs30.grd && \
     mkdir -p /usr/share/git/shakyground && \
-    mv valparaiso_updated_global_vs30.grd /usr/share/git/shakyground/global_vs30.grd
+    mv global_vs30.grd /usr/share/git/shakyground/USGSSlopeBasedTopographyProxy.grd && \
+    mv valparaiso_updated_global_vs30.grd /usr/share/git/shakyground/FromSeismogeotechnicsMicrozonation.grd
