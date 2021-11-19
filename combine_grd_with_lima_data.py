@@ -22,7 +22,7 @@ from grdhelper import write_grd
 
 
 def main():
-    lima_data = gpd.read_file('lima/Soil_Condition_Lima/Soil Condition.shp')
+    lima_data = gpd.read_file("lima/Soil_Condition_Lima/Soil Condition.shp")
     # The only important things here are the following:
     # geometry
     # Vs30Lima2
@@ -30,10 +30,12 @@ def main():
     # -1 (which indicates a missing value)
     # 180.0 (which is the value in the sea)
     # all the rest we want to reuse
-    lima_data_with_interesting_values = lima_data[(lima_data['Vs30Lima2'] != -1.0) & (lima_data['Vs30Lima2'] != 180.0)]
+    lima_data_with_interesting_values = lima_data[
+        (lima_data["Vs30Lima2"] != -1.0) & (lima_data["Vs30Lima2"] != 180.0)
+    ]
     lima_x = lima_data_with_interesting_values.geometry.x.values
     lima_y = lima_data_with_interesting_values.geometry.y.values
-    lima_z = lima_data_with_interesting_values['Vs30Lima2'].values
+    lima_z = lima_data_with_interesting_values["Vs30Lima2"].values
 
     lima_bbox = lima_data_with_interesting_values.total_bounds
     # something like:
@@ -43,16 +45,16 @@ def main():
     # And we build the spatial index
     spatial_index = cKDTree(data=np.vstack([lima_x, lima_y]).T)
 
-    grid_filename = 'global_vs30.grd'
+    grid_filename = "global_vs30.grd"
 
-    grd_file = netcdf_file(grid_filename, 'r')
+    grd_file = netcdf_file(grid_filename, "r")
 
-    grd_x = grd_file.variables['x'][:]
-    grd_y = grd_file.variables['y'][:]
+    grd_x = grd_file.variables["x"][:]
+    grd_y = grd_file.variables["y"][:]
 
     # We need this dataset in the memory as we want to change it
-    grd_z = np.zeros((len(grd_y), len(grd_x)), dtype='float32')
-    grd_z[:] = grd_file.variables['z'][:]
+    grd_z = np.zeros((len(grd_y), len(grd_x)), dtype="float32")
+    grd_z[:] = grd_file.variables["z"][:]
 
     diff_grd_x = np.diff(grd_x).mean()
     diff_grd_y = np.diff(grd_y).mean()
@@ -67,7 +69,7 @@ def main():
     # to the upper left one.
     # this way we can also include points that are a bit outside of
     # our raster cell
-    max_search_dist = np.sqrt((diff_grd_x)**2.0 + (diff_grd_y)**2.0)
+    max_search_dist = np.sqrt((diff_grd_x) ** 2.0 + (diff_grd_y) ** 2.0)
 
     # now we want the grid
     for x_idx, x_val in enumerate(grd_x):
@@ -75,7 +77,9 @@ def main():
             for y_idx, y_val in enumerate(grd_y):
                 if lima_min_y <= y_val <= lima_max_y:
                     # We search for multiple values
-                    spatial_search = spatial_index.query([x_val, y_val], distance_upper_bound=max_search_dist, k=32)
+                    spatial_search = spatial_index.query(
+                        [x_val, y_val], distance_upper_bound=max_search_dist, k=32
+                    )
                     spatial_idxs = []
 
                     for temp_idx in range(len(spatial_search[0])):
@@ -91,9 +95,9 @@ def main():
                         lima_z_on_search = lima_z[search_idx]
                         grd_z[y_idx, x_idx] = lima_z_on_search
 
-    output_file = 'lima_updated_global_vs30.grd'
+    output_file = "lima_updated_global_vs30.grd"
     write_grd(grd_x, grd_y, grd_z, output_file)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

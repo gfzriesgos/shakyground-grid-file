@@ -16,19 +16,21 @@ from shapely.geometry import box
 from grdhelper import write_grd
 
 
-VsBounds = collections.namedtuple('VsBounds', 'min max')
+VsBounds = collections.namedtuple("VsBounds", "min max")
 
 
 def main():
-    valpariso_data = gpd.read_file('valparaiso/Valparaiso_Seismic_Zonation/Zonificación_Sísmica.shp')
+    valpariso_data = gpd.read_file(
+        "valparaiso/Valparaiso_Seismic_Zonation/Zonificación_Sísmica.shp"
+    )
 
     # Those are the worst case shear velocity (vs) values
     vs_by_zone = {
-        'A': VsBounds(min=502, max=np.inf),
-        'B': VsBounds(min=352, max=501),
-        'C': VsBounds(min=182, max=351),
-        'D': VsBounds(min=152, max=181),
-        'E': VsBounds(min=0, max=151)
+        "A": VsBounds(min=502, max=np.inf),
+        "B": VsBounds(min=352, max=501),
+        "C": VsBounds(min=182, max=351),
+        "D": VsBounds(min=152, max=181),
+        "E": VsBounds(min=0, max=151),
     }
 
     spatial_index = rtree.index.Index()
@@ -38,15 +40,14 @@ def main():
 
     valp_min_x, valp_min_y, valp_max_x, valp_max_y = valpariso_data.total_bounds
 
+    grid_filename = "lima_updated_global_vs30.grd"
+    grd_file = netCDF4.Dataset(grid_filename, "r")
 
-    grid_filename = 'lima_updated_global_vs30.grd'
-    grd_file = netCDF4.Dataset(grid_filename, 'r')
+    grd_x = grd_file.variables["x"][:]
+    grd_y = grd_file.variables["y"][:]
 
-    grd_x = grd_file.variables['x'][:]
-    grd_y = grd_file.variables['y'][:]
-
-    grd_z = np.zeros((len(grd_y), len(grd_x)), dtype='float32')
-    grd_z[:] = grd_file.variables['z'][:]
+    grd_z = np.zeros((len(grd_y), len(grd_x)), dtype="float32")
+    grd_z[:] = grd_file.variables["z"][:]
 
     diff_grd_x = np.diff(grd_x).mean()
     diff_grd_y = np.diff(grd_y).mean()
@@ -66,12 +67,14 @@ def main():
                         maxx=search_right,
                         minx=search_left,
                         maxy=search_top,
-                        miny=search_bottom
+                        miny=search_bottom,
                     )
 
-                    search_results = list(spatial_index.intersection(
-                        (search_left, search_bottom, search_right, search_top)
-                    ))
+                    search_results = list(
+                        spatial_index.intersection(
+                            (search_left, search_bottom, search_right, search_top)
+                        )
+                    )
                     # the search result that we have is just based on the bounding
                     # box; we also have to test that our cell is in the geometry
                     # (at least partly)
@@ -90,9 +93,15 @@ def main():
                     bound_max = None
 
                     for seismic_class in found_classes:
-                        if bound_min is None or bound_min < vs_by_zone[seismic_class].min:
+                        if (
+                            bound_min is None
+                            or bound_min < vs_by_zone[seismic_class].min
+                        ):
                             bound_min = vs_by_zone[seismic_class].min
-                        if bound_max is None or bound_max > vs_by_zone[seismic_class].max:
+                        if (
+                            bound_max is None
+                            or bound_max > vs_by_zone[seismic_class].max
+                        ):
                             bound_max = vs_by_zone[seismic_class].max
 
                     if bound_min is None:
@@ -103,12 +112,10 @@ def main():
                     current_value = grd_z[y_idx, x_idx]
 
                     grd_z[y_idx, x_idx] = handle_value_with_bounds(
-                        current_value,
-                        bound_min,
-                        bound_max
+                        current_value, bound_min, bound_max
                     )
 
-    output_file = 'valparaiso_updated_global_vs30.grd'
+    output_file = "valparaiso_updated_global_vs30.grd"
     write_grd(grd_x, grd_y, grd_z, output_file)
 
 
@@ -135,5 +142,5 @@ def handle_value_with_bounds(current_value, bound_min, bound_max):
         return current_value
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
