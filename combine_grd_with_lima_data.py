@@ -78,7 +78,9 @@ def main():
                 if lima_min_y <= y_val <= lima_max_y:
                     # We search for multiple values
                     spatial_search = spatial_index.query(
-                        [x_val, y_val], distance_upper_bound=max_search_dist, k=32
+                        [x_val, y_val],
+                        distance_upper_bound=max_search_dist,
+                        k=32,
                     )
                     spatial_idxs = []
 

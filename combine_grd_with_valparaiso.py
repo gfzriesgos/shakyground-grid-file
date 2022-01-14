@@ -38,7 +38,12 @@ def main():
     for idx, row in valpariso_data.iterrows():
         spatial_index.insert(idx, row.geometry.bounds)
 
-    valp_min_x, valp_min_y, valp_max_x, valp_max_y = valpariso_data.total_bounds
+    (
+        valp_min_x,
+        valp_min_y,
+        valp_max_x,
+        valp_max_y,
+    ) = valpariso_data.total_bounds
 
     grid_filename = "lima_updated_global_vs30.grd"
     grd_file = netCDF4.Dataset(grid_filename, "r")
@@ -72,12 +77,17 @@ def main():
 
                     search_results = list(
                         spatial_index.intersection(
-                            (search_left, search_bottom, search_right, search_top)
+                            (
+                                search_left,
+                                search_bottom,
+                                search_right,
+                                search_top,
+                            )
                         )
                     )
-                    # the search result that we have is just based on the bounding
-                    # box; we also have to test that our cell is in the geometry
-                    # (at least partly)
+                    # the search result that we have is just based on the
+                    # bounding box; we also have to test that our cell is in
+                    # the geometry (at least partly)
                     found_classes = set()
                     for idx in search_results:
                         if valpariso_data.iloc[idx].geometry.intersects(cell):
@@ -87,8 +97,8 @@ def main():
 
                     # Now is the processing based on the classes
                     # At the moment we just want to make sure that
-                    # our resulting data follows the boundaries by the classification
-                    # that was given
+                    # our resulting data follows the boundaries by the
+                    # classification that was given
                     bound_min = None
                     bound_max = None
 

@@ -25,8 +25,6 @@ verify_python:
 python_pycodestyle:
   image: ubuntu:20.04
   stage: test
-  # TODO: fix code to fit with PEP8 guidelines
-  allow_failure: true
   tags:
     - group
   before_script:
@@ -57,7 +55,7 @@ python_black:
     - *install_requirements
     - pip3 install --cache-dir=.pip black==21.4b2
   script:
-    - black --check *.py
+    - black -l 79 --check *.py
 
 dockerbuild_latest:
   image: docker/compose:1.29.2
