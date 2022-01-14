@@ -3,6 +3,7 @@
 import numpy as np
 import netCDF4
 
+
 def write_grd(x, y, z, filename):
     """
     Write the data to a gmt grd file.
@@ -16,26 +17,25 @@ def write_grd(x, y, z, filename):
 
     However for our global vs grid, we need this support for
     large files.
-    
+
     We also follow to use float32 values for the grid as
     our input vs grid does.
     """
-    with netCDF4.Dataset(filename, 'w') as nc:
-        nc.Conventions = 'COARDS/CF-1.0'
+    with netCDF4.Dataset(filename, "w") as nc:
+        nc.Conventions = "COARDS/CF-1.0"
 
-        kx, ky = 'x', 'y'
+        kx, ky = "x", "y"
         nx, ny = len(x), len(y)
 
         nc.createDimension(kx, nx)
         nc.createDimension(ky, ny)
 
-        xvar = nc.createVariable(kx, 'd', (kx,))
+        xvar = nc.createVariable(kx, "d", (kx,))
         xvar.long_name = kx
-        yvar = nc.createVariable(ky, 'd', (ky,))
+        yvar = nc.createVariable(ky, "d", (ky,))
         yvar.long_name = ky
-        zvar = nc.createVariable('z', 'f', (ky, kx))
+        zvar = nc.createVariable("z", "f", (ky, kx))
 
         xvar[:] = x.astype(np.float64)
         yvar[:] = y.astype(np.float64)
         zvar[:] = z.astype(np.float32)
-

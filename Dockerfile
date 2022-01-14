@@ -1,14 +1,21 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
+
+# for not having interaction on installation process
+ENV DEBIAN_FRONTEND noninteractive
 
 WORKDIR /root
 
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y \
-    wget \
-    unzip \
-    python3 \
-    python3-pip \
-    python3-rtree
+        wget \
+        unzip \
+        python3 \
+        python3-pip \
+        python3-rtree \
+        python3-pyproj \
+        proj-bin \
+        libproj-dev
 
 COPY requirements.txt .
 
