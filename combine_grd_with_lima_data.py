@@ -15,8 +15,8 @@ proper data in our local data set.
 
 import geopandas as gpd
 import numpy as np
+import netCDF4
 from scipy.spatial import cKDTree
-from scipy.io.netcdf import netcdf_file
 
 from grdhelper import write_grd
 
@@ -45,14 +45,12 @@ def main():
     # And we build the spatial index
     spatial_index = cKDTree(data=np.vstack([lima_x, lima_y]).T)
 
-    grid_filename = "global_vs30.grd"
-
-    grd_file = netcdf_file(grid_filename, "r")
+    grid_filename = "netcdf.grd"
+    grd_file = netCDF4.Dataset(grid_filename, "r")
 
     grd_x = grd_file.variables["x"][:]
     grd_y = grd_file.variables["y"][:]
 
-    # We need this dataset in the memory as we want to change it
     grd_z = np.zeros((len(grd_y), len(grd_x)), dtype="float32")
     grd_z[:] = grd_file.variables["z"][:]
 

@@ -13,6 +13,7 @@ for Lima and Valparaiso on the fly.
 However, you may need some python dependencies:
 
 ```
+h5py==2.10.0
 netCDF4==1.5.3
 scipy==1.4.1
 Rtree==0.8.3
